@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Achsmontage</title>
+
+<style>
+body { font-family: Arial; }
+
+table {
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    border: 1px solid #999;
+    padding: 6px;
+    text-align: center;
+}
+
+th {
+    background-color: #d9d9d9;
+}
+
+thead tr {
+    border-bottom: 3px solid black;
+}
+
+input {
+    width: 100%;
+    border: none;
+    text-align: center;
+    background: transparent;
+}
+
+.ok {
+    background-color: #ccffcc;
+}
+
+button {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+}
+</style>
+
+</head>
+<body>
+
+<h2>Achsmontage</h2>
+
+<button onclick="addAxle()">+ Neue Achse hinzufügen</button>
+
+<table>
+<thead>
+<tr>
+<th>Seriennummer Achse</th>
+<th>ITEM</th>
+<th>Abstandsmaß Planetenträger ( " V " )</th>
+<th>Abstandsmaß Steckachse ( " X " )</th>
+<th>Errechnete Scheibendicke ( " W " / mm )</th>
+</tr>
+</thead>
+
+<tbody id="tableBody">
+</tbody>
+</table>
+
+<script>
+function toNumber(val) {
+ return parseFloat(val.replace(',', '.'));
+}
+
+function truncate(num, decimals) {
+ let factor = Math.pow(10, decimals);
+ return Math.trunc(num * factor) / factor;
+}
+
+function formatComma(num) {
+ return num.toFixed(3).replace('.', ',');
+}
+
+function calc() {
+ const planet = document.querySelectorAll('.planet');
+ const steck = document.querySelectorAll('.steck');
+ const result = document.querySelectorAll('.result');
+
+ for (let i = 0; i < planet.length; i++) {
+   let p = toNumber(planet[i].value);
+   let s = toNumber(steck[i].value);
+
+   if (!isNaN(p) && !isNaN(s)) {
+     let res = truncate(p - s, 3);
+     result[i].value = formatComma(res);
+     result[i].classList.add('ok');
+   } else {
+     result[i].value = '';
+     result[i].classList.remove('ok');
+   }
+ }
+}
+
+// 🔥 HIER passiert die Magie
+function addAxle() {
+ const tbody = document.getElementById('tableBody');
+
+ tbody.insertAdjacentHTML('beforeend', `
+
+<!-- Vorderachse -->
+<tr>
+<td rowspan="2"><input placeholder="Vorderachse"></td>
+<td>VL</td>
+<td><input class="planet" oninput="calc()"></td>
+<td><input class="steck" oninput="calc()"></td>
+<td><input class="result" readonly></td>
+</tr>
+
+<tr>
+<td>VR</td>
+<td><input class="planet" oninput="calc()"></td>
+<td><input class="steck" oninput="calc()"></td>
+<td><input class="result" readonly></td>
+</tr>
+
+<!-- Hinterachse -->
+<tr>
+<td rowspan="2"><input placeholder="Hinterachse"></td>
+<td>HL</td>
+<td><input class="planet" oninput="calc()"></td>
+<td><input class="steck" oninput="calc()"></td>
+<td><input class="result" readonly></td>
+</tr>
+
+<tr>
+<td>HR</td>
+<td><input class="planet" oninput="calc()"></td>
+<td><input class="steck" oninput="calc()"></td>
+<td><input class="result" readonly></td>
+</tr>
+
+<!-- ✅ Trennlinie jetzt richtig -->
+<tr>
+<td colspan="5" style="border-top:3px solid black;"></td>
+</tr>
+
+`);
+}
+
+// direkt einen Block beim Laden erzeugen
+addAxle();
+</script>
+
+</body>
+</html>
